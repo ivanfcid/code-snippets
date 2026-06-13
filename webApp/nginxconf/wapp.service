@@ -1,0 +1,13 @@
+[Unit]
+Description=Flask App
+After=network.target
+
+[Service]
+User=ivan
+Group=nginx
+WorkingDirectory=/home/web
+Environment="PATH=/home/anaconda3/envs/web/bin"
+ExecStart=/bin/bash -c "/home/anaconda3/envs/web/bin/uwsgi --ini wapp.ini"
+
+[Install]
+WantedBy=multi-user.target

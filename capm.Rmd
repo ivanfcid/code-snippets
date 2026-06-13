@@ -1,0 +1,200 @@
+---
+title: "Portfolio"
+author: "Ivan Fernandez Cid"
+date: '2022-06-20'
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+## Correlation Matrix
+
+```{r correlation matrix}
+library(quantmod)
+library(xts)
+library(corrplot)
+library(dygraphs)
+
+
+portfolio <- c("IBM", "PG", "TSLA")
+prices <- getSymbols(portfolio, src="yahoo", from="2019-01-04", to="2022-05-17")
+
+df <- data.frame(IBM$IBM.Close, PG$PG.Close, TSLA$TSLA.Close)
+colnames(df) <- portfolio
+corrmatrix <- cor(df)
+corrmatrix
+```
+
+```{r correlation matrix plot}
+ibm.ts <- xts(IBM$IBM.Close, frequency = 365)
+pg.ts <- xts(PG$PG.Close, frequency = 365)
+tsla.ts <- xts(TSLA$TSLA.Close, frequency = 365)
+stocks <- cbind(ibm.ts, pg.ts, tsla.ts)
+colnames(stocks) <- portfolio
+dygraph(stocks, ylab = "Precios al cierre")%>%
+  dyRangeSelector(height = 20)
+```
+
+## Technical Analysis
+
+```{r technical analysis}
+library(quantmod)
+library(data.table)
+library(ggplot2)
+library(tidyquant)
+getSymbols("IBM", src = 'yahoo')
+stock <- as.data.table(IBM)
+names(stock)[1] <- c("Date")
+tail(stock)
+```
+
+```{r techn volume}
+ggplot(stock, aes(x=Date, y=IBM.Volume/1000000))+
+  geom_bar(aes(fill=IBM.Volume/1000000), stat = "identity")+
+  labs(title = "Volumen IBM", y="Volumen en millones", x="Periodo")+
+  ylim(0,55)+
+  theme(legend.position = "None")
+
+```
+
+```{r weighted average}
+ggplot(stock, aes(x=Date, y=IBM.Close))+
+  geom_line(aes(open=IBM.Open, high=IBM.High, low=IBM.Low, close=IBM.Close), size=1)+
+  geom_ma(color = "blue", size=1, n= 30, show.legend = TRUE)+
+  geom_ma(color = "green", size=1, n=90, show.legend = TRUE)+
+  labs(title = "IBM", subtitle = "30 y 90 días media móvil simple", y="Precio de cierre", x="Periodo")+
+  ylim(45, 130)+
+  coord_x_date(xlim = c("2020-01-01", "2022-06-17"))
+```
+
+```{r boolinger}
+ggplot(stock,aes(x=Date, y=IBM.Close, open = IBM.Open, high = IBM.High, low = IBM.Low, close = IBM.Close))+
+  labs(title = "Banda de Bollinger", y = "Precio de cierre", x = "Periodo")+
+  geom_line(size=1)+
+  geom_bbands(ma_fun = SMA, sd = 2, n = 30, linetype = 5)+
+  coord_x_date(xlim = c("2020-01-01", "2022-06-17"))+
+  ylim(25,125)
+```
+
+```{r índice fuerza relativa}
+stock$rsi <- RSI(stock$IBM.Close, n=14)
+ggplot(stock,aes(x=Date, y=rsi))+
+  geom_line()+
+  geom_hline(yintercept= 30, linetype = "dashed", color = "red")+
+  geom_hline(yintercept= 70, linetype = "dashed", color = "green")+
+  labs(title = "IBM Índice de fuerza relativa (RSI)", y = "RSI", x = "Periodo")+
+  coord_x_date(xlim = c("2020-01-01", "2022-07-17"))
+```
+
+```{r graphs}
+chartSeries(IBM, subset="2020-01-01::2022-06-17", theme=chartTheme("white"))
+addBBands(n=20, sd=2)
+addRSI(n=14, maType="EMA")
+addMACD(fast=12, slow=26, signal=9, type="EMA")
+```
+
+## Value at Risk
+
+```{r VaR}
+library(quantmod)
+library(PerformanceAnalytics)
+maxDate <- "2000-01-01"
+PG.p <- Ad(getSymbols("PG", auto.assign = FALSE, from <- maxDate))
+PG.r <- dailyReturn(PG.p)
+VaR(PG.r, p = 0.95, method = "historical")
+```
+
+```{r VaR plot}
+plot(PG.r)
+```
+
+```{r CVaR}
+CVaR(PG.r, p = 0.95, method = "historical")
+```
+
+```{r paramétrico}
+CVaR(PG.r, p = 0.95, method = "gaussian")
+```
+
+```{r}
+weights <- c(0.40, 0.20, 0.40)
+port.p <- na.omit(merge(Ad(IBM), Ad(PG), Ad(TSLA)))
+port.r <- ROC(port.p, type = "discrete")[-1,]
+colnames(port.r) <- portfolio
+
+portvar_gaus <- VaR(port.r, p = 0.99, weights = weights, portfolio_method = "component", method = "gaussian")$VaR[1]
+portvar_hist <- VaR(port.r, p = 0.99, weights = weights, portfolio_method = "component", method = "historical")$hVaR[1]
+portvar_mod <- VaR(port.r, p = 0.99, weights = weights, portfolio_method = "component", method = "modified")$MVaR[1]
+VaR_gen <- rbind(portvar_gaus, portvar_hist, portvar_mod)
+
+portvar_gaus.1 <- VaR(port.r, p = 0.99, weights = NULL, portfolio_method = "single", method = "gaussian")
+portvar_hist.1 <- VaR(port.r, p = 0.99, weights = NULL, portfolio_method = "single", method = "historical")
+portvar_mod.1 <- VaR(port.r, p = 0.99, weights = NULL, portfolio_method = "single", method = "modified")
+
+var_ind <- rbind(portvar_gaus.1, portvar_hist.1, portvar_mod.1)
+rownames(var_ind) <- c("Histórico", "Gauss", "Modificado")
+VaR_Final <- cbind(var_ind, VaR_gen)
+
+write.csv(VaR_Final, "Coeficientes VaR_Clase.csv", row.names = TRUE)
+```
+
+## CAPM
+
+```{r CAPM}
+library(quantmod)
+library(ggfortify)
+library(PerformanceAnalytics)
+
+portfolio2 <- c("SPY", "IBM")
+prices2 <- getSymbols(portfolio2, src = "yahoo", from = "2019-01-04", to = "2022-06-17", auto.assign = TRUE, warnings = FALSE)
+port2.p <- na.omit(merge(Ad(SPY), Ad(IBM)))
+colnames(port2.p) <- portfolio2
+
+IBM_monthly <- to.monthly(port2.p$IBM)
+SP500_monthly <- to.monthly(port2.p$SPY)
+ibm_ret <- monthlyReturn(IBM_monthly, type = "log")
+sp500_ret <- monthlyReturn(SP500_monthly, type = "log")
+
+getSymbols('TB3MS',src='FRED', from="2019-01-04", to = "2022-06-17")
+
+TB3MS_a<-TB3MS["2019/2022"] 
+TB3MS_a<-to.monthly(TB3MS_a) 
+TB3MS.m<- (1+TB3MS_a[,1]/100)^(1/12)-1 
+
+CAPM1 <- cov(ibm_ret, sp500_ret)/var(sp500_ret) 
+CAPM1
+```
+
+```{r}
+ri_rf <-ibm_ret-TB3MS.m 
+rm_rf <-sp500_ret-TB3MS.m 
+regresion<-lm(ri_rf ~ rm_rf) 
+summary(regresion)
+```
+
+```{r}
+regresion2 <- lm(ibm_ret ~ sp500_ret)
+summary(regresion2)
+```
+
+```{r}
+CAPM.beta(ibm_ret,sp500_ret,TB3MS.m)
+CAPM.alpha(ibm_ret,sp500_ret,TB3MS.m)
+```
+
+```{r}
+CAPM_IBM<-cbind(sp500_ret,ibm_ret)
+CAPM_IBM.df = as.data.frame(CAPM_IBM)
+CAPM2 = lm(ibm_ret~0+sp500_ret,data=CAPM_IBM.df)
+summary(CAPM2)
+```
+
+```{r}
+plot(CAPM_IBM.df$monthly.returns.1,CAPM_IBM.df$monthly.returns,
+     main = "Regresión CAPM para IBM",
+     ylab = "Excedente de retornos para IBM",
+     xlab = "Excedente de retornos en el mercado")
+abline(CAPM2, col = "red")
+abline(h=0,v=0)
+```

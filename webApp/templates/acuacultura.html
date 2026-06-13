@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="generator" content="Jekyll v4.1.1">
+    <title>Acuacultura</title>
+    <!--<link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/starter-template/">-->
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static', filename ='main.css')}}">
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#">Acuacultura</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+	<span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+	<ul class="navbar-nav nav mr-auto">
+	  <li class="nav-item">
+            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home">Inicio</a>
+	  </li>
+	  <li class="nav-item">
+            <a class="nav-link" id="expenses-tab" data-toggle="tab" href="#expenses">Captura</a>
+	  </li>
+	  <li class="nav-item">
+            <a class="nav-link" id="planning-tab" data-toggle="tab" href="#planning">Consulta</a>
+	  </li>
+	</ul>
+      </div>
+    </nav>
+    <main role="main" class="container">
+      <div class="tab-content wapp" id="myTabContent">
+	<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+	  <h1>Acuacultura</h1>
+	  <p class="lead">Sistema de altas y consultas.</p>
+	</div>
+
+	<div class="tab-pane fade" id="expenses" role="tabpanel" aria-labelledby="expenses-tab">
+	  <h2>Captura</h2>
+	  <form>
+	    <h3>Agregar registro</h3>
+	    <div class="input-group mb-3">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="inputGroup-sizing-default">Concepto</span>
+	      </div>
+	      <input id="txtConcept" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+	      <div id="radioType" class="btn-group btn-group-toggle" data-toggle="buttons">
+		<label class="btn btn-light active">
+		  <input type="radio" name="options" id="option1" value="income" checked> Temperatura
+		</label>
+		<label class="btn btn-light">
+		  <input type="radio" name="options" id="option2" value="expense" > Otro
+		</label>
+	      </div>
+	    </div>
+	    <div class="input-group mb-3">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="inputGroup-sizing-default1">Cantidad</span>
+	      </div>
+	      <input id="amount" type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+	    </div>
+	    <div class="input-group mb-3">
+	      <div class="input-group-prepend">
+		<label class="input-group-text" for="inputGroupSelect01">Grupo</label>
+	      </div>
+	      <select class="custom-select" id="inputGroupSelect01">
+		<option value="savings">1</option>
+		<option value="investment">Investment</option>
+		<option value="services">Services</option>
+		<option value="technology">Technology</option>
+		<option value="games">Games</option>
+		<option value="transportation">Transportation</option>
+		<option value="food">Food</option>
+		<option value="grooming">Grooming</option>
+		<option value="gifts">Gifts</option>
+	      </select>
+	    </div>
+	    <div class="input-group">
+	      <div class="input-group-prepend">
+		<span class="input-group-text" id="inputGroup-sizing-default3">Fecha</span>
+	      </div>
+	      <input id="dateItem" type="date" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+	    </div>
+	    <button type="submit" class="btn btn-primary">Enviar</button>
+	  </form>
+	</div>
+	
+	<div class="tab-pane fade" id="planning" role="tabpanel" aria-labelledby="planning-tab">
+	  <h2>Consulta</h2>
+	</div>
+      </div>
+    </main><!-- /.container -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename = 'main.js') }}"></script>
+</html>
